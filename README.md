@@ -25,16 +25,18 @@
 
 ## 스크린샷
 
-- 홈
-  ![home](public/screenshots/home.png)
-- 참가자 참여(초대 링크)
-  ![join](public/screenshots/join.png)
-- 실시간 음주 트래킹(룸)
-  ![room](public/screenshots/room.png)
-- 비용 입력/정산
-  ![settle](public/screenshots/settle.png)
-- 영수증 스타일 결과
-  ![result](public/screenshots/result.png)
+- 홈 (모바일)
+  ![home](public/screenshots/mobile-home.png)
+- 참가자 참여(초대 링크, 모바일)
+  ![join](public/screenshots/mobile-join.png)
+- 실시간 음주 트래킹(룸, 모바일)
+  ![room](public/screenshots/mobile-room.png)
+- 잔 추가 기능 (+1 마셨다!)
+  ![drink-add](public/screenshots/mobile-drink-add.png)
+- 비용 입력/정산 (모바일)
+  ![settle](public/screenshots/mobile-settle.png)
+- 영수증 스타일 결과 (모바일)
+  ![result](public/screenshots/mobile-result.png)
 
 ## 기술 스택
 
