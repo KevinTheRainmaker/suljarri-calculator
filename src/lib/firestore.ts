@@ -1,0 +1,170 @@
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "./firebase";
+
+export interface RoomDoc {
+  hostId: string;
+  status: "active" | "closed";
+  createdAt: Timestamp;
+  closedAt: Timestamp | null;
+  deleteAt: Timestamp | null;
+}
+
+export interface ParticipantDoc {
+  name: string;
+  status: "active" | "left";
+  isKkakdugi: boolean;
+  soju: number;
+  beer: number;
+  lastTapAt: Timestamp | null;
+}
+
+export interface SettlementDoc {
+  sojuTotal: number;
+  beerTotal: number;
+  result: Record<string, number>;
+}
+
+// 방 생성
+export async function createRoom(hostId: string): Promise<string> {
+  const ref = await addDoc(collection(db, "rooms"), {
+    hostId,
+    status: "active",
+    createdAt: serverTimestamp(),
+    closedAt: null,
+    deleteAt: null,
+  });
+  return ref.id;
+}
+
+// 참여자 추가
+export async function joinRoom(roomId: string, name: string): Promise<string> {
+  const ref = await addDoc(collection(db, "rooms", roomId, "participants"), {
+    name,
+    status: "active",
+    isKkakdugi: false,
+    soju: 0,
+    beer: 0,
+    lastTapAt: null,
+  } as ParticipantDoc);
+  return ref.id;
+}
+
+// 잔수 업데이트 (rate limit은 클라이언트에서 처리)
+export async function updateDrinkCount(
+  roomId: string,
+  participantId: string,
+  field: "soju" | "beer",
+  delta: number,
+  currentCount: number,
+): Promise<void> {
+  const newCount = Math.max(0, currentCount + delta);
+  await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
+    [field]: newCount,
+    lastTapAt: serverTimestamp(),
+  });
+}
+
+// 깍두기 토글
+export async function toggleKkakdugi(
+  roomId: string,
+  participantId: string,
+  isKkakdugi: boolean,
+): Promise<void> {
+  await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
+    isKkakdugi,
+  });
+}
+
+// 중도 하차
+export async function leaveRoom(
+  roomId: string,
+  participantId: string,
+): Promise<void> {
+  await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
+    status: "left",
+  });
+}
+
+// 술자리 종료
+export async function closeRoom(roomId: string): Promise<void> {
+  const closedAt = Timestamp.now();
+  const deleteAt = Timestamp.fromMillis(
+    closedAt.toMillis() + 24 * 60 * 60 * 1000,
+  );
+  await updateDoc(doc(db, "rooms", roomId), {
+    status: "closed",
+    closedAt,
+    deleteAt,
+  });
+}
+
+// 정산 결과 저장
+export async function saveSettlement(
+  roomId: string,
+  sojuTotal: number,
+  beerTotal: number,
+  result: Record<string, number>,
+): Promise<void> {
+  await setDoc(doc(db, "rooms", roomId, "settlement", "result"), {
+    sojuTotal,
+    beerTotal,
+    result,
+  });
+}
+
+// 건배 (활성 참여자 전원 +1)
+export async function toastAll(
+  roomId: string,
+  type: "soju" | "beer",
+  participants: (ParticipantDoc & { id: string })[],
+): Promise<void> {
+  const active = participants.filter(
+    (p) => p.status === "active" && !p.isKkakdugi,
+  );
+  const updates = active.map((p) =>
+    updateDoc(doc(db, "rooms", roomId, "participants", p.id), {
+      [type]: (type === "soju" ? p.soju : p.beer) + 1,
+    }),
+  );
+  await Promise.all(updates);
+}
+
+// 실시간 참여자 구독 (리더보드 — 잔수 합계만 동기화)
+export function subscribeParticipants(
+  roomId: string,
+  callback: (participants: (ParticipantDoc & { id: string })[]) => void,
+) {
+  return onSnapshot(collection(db, "rooms", roomId, "participants"), (snap) => {
+    callback(
+      snap.docs.map((d) => ({ id: d.id, ...(d.data() as ParticipantDoc) })),
+    );
+  });
+}
+
+// 방 상태 구독
+export function subscribeRoom(
+  roomId: string,
+  callback: (room: RoomDoc | null) => void,
+) {
+  return onSnapshot(doc(db, "rooms", roomId), (snap) => {
+    callback(snap.exists() ? (snap.data() as RoomDoc) : null);
+  });
+}
+
+// 정산 결과 조회
+export async function getSettlement(
+  roomId: string,
+): Promise<SettlementDoc | null> {
+  const snap = await getDoc(doc(db, "rooms", roomId, "settlement", "result"));
+  return snap.exists() ? (snap.data() as SettlementDoc) : null;
+}
