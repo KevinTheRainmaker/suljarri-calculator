@@ -11,6 +11,50 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 
+const isDemo = import.meta.env.VITE_DEMO_MODE === "true";
+const demoRoomId = "demo-room";
+const demoRoom: RoomDoc = {
+  hostId: "demo-host",
+  status: "active",
+  createdAt: Timestamp.now(),
+  closedAt: null,
+  deleteAt: null,
+};
+let demoParticipants: (ParticipantDoc & { id: string })[] = [
+  {
+    id: "p1",
+    name: "지민",
+    status: "active",
+    isKkakdugi: false,
+    soju: 3,
+    beer: 1,
+    lastTapAt: Timestamp.now(),
+  },
+  {
+    id: "p2",
+    name: "민수",
+    status: "active",
+    isKkakdugi: false,
+    soju: 2,
+    beer: 2,
+    lastTapAt: Timestamp.now(),
+  },
+  {
+    id: "p3",
+    name: "서연",
+    status: "active",
+    isKkakdugi: true,
+    soju: 1,
+    beer: 0,
+    lastTapAt: Timestamp.now(),
+  },
+];
+let demoSettlement: SettlementDoc | null = {
+  sojuTotal: 30000,
+  beerTotal: 20000,
+  result: { 지민: 20000, 민수: 20000 },
+};
+
 export interface RoomDoc {
   hostId: string;
   status: "active" | "closed";
@@ -36,6 +80,10 @@ export interface SettlementDoc {
 
 // 방 생성
 export async function createRoom(hostId: string): Promise<string> {
+  if (isDemo) {
+    demoRoom.hostId = hostId;
+    return demoRoomId;
+  }
   const ref = await addDoc(collection(db, "rooms"), {
     hostId,
     status: "active",
@@ -48,6 +96,22 @@ export async function createRoom(hostId: string): Promise<string> {
 
 // 참여자 추가
 export async function joinRoom(roomId: string, name: string): Promise<string> {
+  if (isDemo) {
+    const id = `demo-${Date.now()}`;
+    demoParticipants = [
+      ...demoParticipants,
+      {
+        id,
+        name,
+        status: "active",
+        isKkakdugi: false,
+        soju: 0,
+        beer: 0,
+        lastTapAt: Timestamp.now(),
+      },
+    ];
+    return id;
+  }
   const ref = await addDoc(collection(db, "rooms", roomId, "participants"), {
     name,
     status: "active",
@@ -68,6 +132,14 @@ export async function updateDrinkCount(
   currentCount: number,
 ): Promise<void> {
   const newCount = Math.max(0, currentCount + delta);
+  if (isDemo) {
+    demoParticipants = demoParticipants.map((p) =>
+      p.id === participantId
+        ? { ...p, [field]: newCount, lastTapAt: Timestamp.now() }
+        : p,
+    );
+    return;
+  }
   await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
     [field]: newCount,
     lastTapAt: serverTimestamp(),
@@ -80,6 +152,12 @@ export async function toggleKkakdugi(
   participantId: string,
   isKkakdugi: boolean,
 ): Promise<void> {
+  if (isDemo) {
+    demoParticipants = demoParticipants.map((p) =>
+      p.id === participantId ? { ...p, isKkakdugi } : p,
+    );
+    return;
+  }
   await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
     isKkakdugi,
   });
@@ -90,6 +168,12 @@ export async function leaveRoom(
   roomId: string,
   participantId: string,
 ): Promise<void> {
+  if (isDemo) {
+    demoParticipants = demoParticipants.map((p) =>
+      p.id === participantId ? { ...p, status: "left" } : p,
+    );
+    return;
+  }
   await updateDoc(doc(db, "rooms", roomId, "participants", participantId), {
     status: "left",
   });
@@ -101,6 +185,12 @@ export async function closeRoom(roomId: string): Promise<void> {
   const deleteAt = Timestamp.fromMillis(
     closedAt.toMillis() + 24 * 60 * 60 * 1000,
   );
+  if (isDemo) {
+    demoRoom.status = "closed";
+    demoRoom.closedAt = closedAt;
+    demoRoom.deleteAt = deleteAt;
+    return;
+  }
   await updateDoc(doc(db, "rooms", roomId), {
     status: "closed",
     closedAt,
@@ -115,6 +205,10 @@ export async function saveSettlement(
   beerTotal: number,
   result: Record<string, number>,
 ): Promise<void> {
+  if (isDemo) {
+    demoSettlement = { sojuTotal, beerTotal, result };
+    return;
+  }
   await setDoc(doc(db, "rooms", roomId, "settlement", "result"), {
     sojuTotal,
     beerTotal,
@@ -131,6 +225,14 @@ export async function toastAll(
   const active = participants.filter(
     (p) => p.status === "active" && !p.isKkakdugi,
   );
+  if (isDemo) {
+    demoParticipants = demoParticipants.map((p) =>
+      active.find((a) => a.id === p.id)
+        ? { ...p, [type]: (type === "soju" ? p.soju : p.beer) + 1 }
+        : p,
+    );
+    return;
+  }
   const updates = active.map((p) =>
     updateDoc(doc(db, "rooms", roomId, "participants", p.id), {
       [type]: (type === "soju" ? p.soju : p.beer) + 1,
@@ -144,6 +246,10 @@ export function subscribeParticipants(
   roomId: string,
   callback: (participants: (ParticipantDoc & { id: string })[]) => void,
 ) {
+  if (isDemo) {
+    callback(demoParticipants);
+    return () => {};
+  }
   return onSnapshot(collection(db, "rooms", roomId, "participants"), (snap) => {
     callback(
       snap.docs.map((d) => ({ id: d.id, ...(d.data() as ParticipantDoc) })),
@@ -156,6 +262,10 @@ export function subscribeRoom(
   roomId: string,
   callback: (room: RoomDoc | null) => void,
 ) {
+  if (isDemo) {
+    callback(demoRoom);
+    return () => {};
+  }
   return onSnapshot(doc(db, "rooms", roomId), (snap) => {
     callback(snap.exists() ? (snap.data() as RoomDoc) : null);
   });
@@ -165,6 +275,9 @@ export function subscribeRoom(
 export async function getSettlement(
   roomId: string,
 ): Promise<SettlementDoc | null> {
+  if (isDemo) {
+    return demoSettlement;
+  }
   const snap = await getDoc(doc(db, "rooms", roomId, "settlement", "result"));
   return snap.exists() ? (snap.data() as SettlementDoc) : null;
 }
