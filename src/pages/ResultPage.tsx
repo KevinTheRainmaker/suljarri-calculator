@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toPng } from "html-to-image";
+import {
+  Receipt,
+  ClipboardText,
+  Camera,
+  ShareNetwork,
+} from "@phosphor-icons/react";
 import { getSettlement } from "../lib/firestore";
 import { useRoom } from "../hooks/useRoom";
 
@@ -78,7 +84,9 @@ export default function ResultPage() {
 
   return (
     <div className="flex flex-col items-center px-4 pt-6 pb-24 min-h-screen">
-      <h1 className="text-2xl font-bold mb-1">🧾 정산 결과</h1>
+      <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
+        <Receipt size={26} weight="bold" /> 정산 결과
+      </h1>
       <p className="text-gray-400 text-sm mb-6">마신 만큼, 딱 그만큼</p>
 
       {/* 영수증 (캡처 대상) */}
@@ -131,19 +139,22 @@ export default function ResultPage() {
           onClick={handleCopyText}
           className="w-full py-4 bg-amber-500 hover:bg-amber-400 rounded-xl font-bold text-black"
         >
-          📋 정산 내역 복사
+          <ClipboardText size={18} weight="bold" className="inline mr-1" />
+          정산 내역 복사
         </button>
         <button
           onClick={handleSaveImage}
           className="w-full py-4 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium"
         >
-          📸 이미지 저장
+          <Camera size={18} weight="bold" className="inline mr-1" />
+          이미지 저장
         </button>
         <button
           onClick={handleShare}
           className="w-full py-4 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium"
         >
-          🔗 링크 공유
+          <ShareNetwork size={18} weight="bold" className="inline mr-1" />
+          링크 공유
         </button>
       </div>
     </div>

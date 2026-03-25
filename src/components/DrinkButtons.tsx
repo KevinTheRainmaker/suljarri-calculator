@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Hourglass } from "@phosphor-icons/react";
 import { updateDrinkCount } from "../lib/firestore";
 
 interface Props {
@@ -60,7 +61,11 @@ export default function DrinkButtons({
             disabled={cooldown["soju"]}
             className="flex-[2] py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 rounded-xl text-xl font-bold transition-colors"
           >
-            {cooldown["soju"] ? "⏳" : "+1 마셨다!"}
+            {cooldown["soju"] ? (
+              <Hourglass size={20} className="inline" />
+            ) : (
+              "+1 마셨다!"
+            )}
           </button>
         </div>
       </div>
@@ -83,7 +88,11 @@ export default function DrinkButtons({
             disabled={cooldown["beer"]}
             className="flex-[2] py-4 bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 rounded-xl text-xl font-bold transition-colors"
           >
-            {cooldown["beer"] ? "⏳" : "+1 마셨다!"}
+            {cooldown["beer"] ? (
+              <Hourglass size={20} className="inline" />
+            ) : (
+              "+1 마셨다!"
+            )}
           </button>
         </div>
       </div>

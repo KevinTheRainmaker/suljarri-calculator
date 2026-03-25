@@ -10,6 +10,7 @@ import {
   closeRoom,
   toastAll,
 } from "../lib/firestore";
+import { QrCode, Eye, Hourglass, FlagCheckered } from "@phosphor-icons/react";
 import Leaderboard from "../components/Leaderboard";
 import DrinkButtons from "../components/DrinkButtons";
 import QRShareModal from "../components/QRShareModal";
@@ -110,14 +111,16 @@ export default function RoomPage() {
           onClick={() => setShowQR(true)}
           className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm"
         >
-          📱 초대
+          <QrCode size={16} weight="bold" className="inline mr-1" />
+          초대
         </button>
       </div>
 
       {/* 노티 배너 */}
       {notification && (
         <div className="w-full max-w-md mb-4 px-4 py-3 bg-yellow-500/20 border border-yellow-500/50 rounded-xl text-center text-sm">
-          👀 <strong>{notification}</strong>님, 진짜 안마시고 있음?
+          <Eye size={14} weight="bold" className="inline mr-1" />
+          <strong>{notification}</strong>님, 진짜 안마시고 있음?
         </div>
       )}
 
@@ -163,21 +166,30 @@ export default function RoomPage() {
               disabled={toastCooldown}
               className="flex-1 py-3 bg-blue-700 hover:bg-blue-600 disabled:bg-gray-600 rounded-xl text-sm font-medium"
             >
-              {toastCooldown ? "⏳" : "🍶 건배"}
+              {toastCooldown ? (
+                <Hourglass size={16} className="inline" />
+              ) : (
+                "🍶 건배"
+              )}
             </button>
             <button
               onClick={() => handleToast("beer")}
               disabled={toastCooldown}
               className="flex-1 py-3 bg-amber-700 hover:bg-amber-600 disabled:bg-gray-600 rounded-xl text-sm font-medium"
             >
-              {toastCooldown ? "⏳" : "🍺 건배"}
+              {toastCooldown ? (
+                <Hourglass size={16} className="inline" />
+              ) : (
+                "🍺 건배"
+              )}
             </button>
           </div>
           <button
             onClick={handleClose}
             className="w-full py-4 bg-red-600 hover:bg-red-500 rounded-xl font-bold"
           >
-            🏁 술자리 종료 & 정산
+            <FlagCheckered size={18} weight="fill" className="inline mr-1" />
+            술자리 종료 & 정산
           </button>
         </div>
       )}

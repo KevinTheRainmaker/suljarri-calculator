@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Calculator } from "@phosphor-icons/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRoom } from "../hooks/useRoom";
 import { saveSettlement } from "../lib/firestore";
@@ -99,7 +100,14 @@ export default function SettlePage() {
         disabled={loading}
         className="w-full max-w-xs py-5 bg-amber-500 hover:bg-amber-400 disabled:bg-gray-600 rounded-2xl text-xl font-bold text-black"
       >
-        {loading ? "계산 중..." : "정산하기 🧮"}
+        {loading ? (
+          "계산 중..."
+        ) : (
+          <>
+            <Calculator size={20} weight="bold" className="inline mr-1" />
+            정산하기
+          </>
+        )}
       </button>
     </div>
   );
