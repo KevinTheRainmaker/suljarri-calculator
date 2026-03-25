@@ -6,7 +6,7 @@ interface Props {
   participantId: string;
   soju: number;
   beer: number;
-  onLeave: () => void;
+  onLeave?: () => void;
 }
 
 const RATE_LIMIT_MS = 10_000;
@@ -88,13 +88,15 @@ export default function DrinkButtons({
         </div>
       </div>
 
-      {/* 중도 하차 */}
-      <button
-        onClick={onLeave}
-        className="w-full py-3 text-gray-500 hover:text-gray-300 text-sm underline"
-      >
-        귀가할게요 (중도 하차)
-      </button>
+      {/* 중도 하차 (방장에게는 표시 안 함) */}
+      {onLeave && (
+        <button
+          onClick={onLeave}
+          className="w-full py-3 text-gray-500 hover:text-gray-300 text-sm underline"
+        >
+          귀가할게요 (중도 하차)
+        </button>
+      )}
     </div>
   );
 }

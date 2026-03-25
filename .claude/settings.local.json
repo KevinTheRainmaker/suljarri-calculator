@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"Exit: $?\")",
+      "Bash(node:*)",
+      "Bash(\"C:/Users/HCIS/Desktop/git/suljarri-calculator/.env.local.example\":*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}

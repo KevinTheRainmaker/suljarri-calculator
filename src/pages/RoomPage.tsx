@@ -1,8 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRoom } from "../hooks/useRoom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useNotification } from "../hooks/useNotification";
+import type { ToastEvent } from "../lib/firestore";
 import {
   toggleKkakdugi,
   leaveRoom,
@@ -12,6 +13,7 @@ import {
 import Leaderboard from "../components/Leaderboard";
 import DrinkButtons from "../components/DrinkButtons";
 import QRShareModal from "../components/QRShareModal";
+import ToastOverlay from "../components/ToastOverlay";
 
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>()!;
@@ -24,6 +26,9 @@ export default function RoomPage() {
   );
   const [showQR, setShowQR] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [toastCooldown, setToastCooldown] = useState(false);
+  const [toastEffect, setToastEffect] = useState<ToastEvent | null>(null);
+  const lastToastRef = useRef<number>(0);
 
   const handleNotify = useCallback((name: string) => {
     setNotification(name);
@@ -31,6 +36,16 @@ export default function RoomPage() {
   }, []);
 
   useNotification(participants, participantId, handleNotify);
+
+  // 건배 이벤트 감지 → 오버레이 표시
+  useEffect(() => {
+    const toast = room?.lastToast;
+    if (!toast || toast.at <= lastToastRef.current) return;
+    lastToastRef.current = toast.at;
+    setToastEffect({ ...toast });
+    const timer = setTimeout(() => setToastEffect(null), 2600);
+    return () => clearTimeout(timer);
+  }, [room?.lastToast]);
 
   const isHost = room?.hostId === hostId;
   const me = participants.find((p) => p.id === participantId);
@@ -48,6 +63,12 @@ export default function RoomPage() {
         방을 찾을 수 없습니다
       </div>
     );
+
+  // 종료된 방은 정산 결과로 리다이렉트
+  if (room.status === "closed") {
+    navigate(`/room/${roomId}/result`, { replace: true });
+    return null;
+  }
 
   // 참여자가 없으면 (총무만 있거나, 새로운 참여자) join 페이지로
   if (!isHost && !me) {
@@ -71,6 +92,13 @@ export default function RoomPage() {
   async function handleToggleKkakdugi(id: string, current: boolean) {
     if (!roomId) return;
     await toggleKkakdugi(roomId, id, !current);
+  }
+
+  async function handleToast(type: "soju" | "beer") {
+    if (toastCooldown || !roomId) return;
+    setToastCooldown(true);
+    await toastAll(roomId, type, participants);
+    setTimeout(() => setToastCooldown(false), 10_000);
   }
 
   return (
@@ -103,14 +131,14 @@ export default function RoomPage() {
         />
       </div>
 
-      {/* 내 음주 기록 버튼 (참여자만) */}
+      {/* 내 음주 기록 버튼 (참여자 & 방장 모두) */}
       {me && me.status === "active" && (
         <DrinkButtons
           roomId={roomId!}
           participantId={participantId!}
           soju={me.soju}
           beer={me.beer}
-          onLeave={handleLeave}
+          onLeave={isHost ? undefined : handleLeave}
         />
       )}
 
@@ -131,16 +159,18 @@ export default function RoomPage() {
           </button>
           <div className="flex gap-2">
             <button
-              onClick={() => toastAll(roomId!, "soju", participants)}
-              className="flex-1 py-3 bg-blue-700 hover:bg-blue-600 rounded-xl text-sm font-medium"
+              onClick={() => handleToast("soju")}
+              disabled={toastCooldown}
+              className="flex-1 py-3 bg-blue-700 hover:bg-blue-600 disabled:bg-gray-600 rounded-xl text-sm font-medium"
             >
-              🍶 건배
+              {toastCooldown ? "⏳" : "🍶 건배"}
             </button>
             <button
-              onClick={() => toastAll(roomId!, "beer", participants)}
-              className="flex-1 py-3 bg-amber-700 hover:bg-amber-600 rounded-xl text-sm font-medium"
+              onClick={() => handleToast("beer")}
+              disabled={toastCooldown}
+              className="flex-1 py-3 bg-amber-700 hover:bg-amber-600 disabled:bg-gray-600 rounded-xl text-sm font-medium"
             >
-              🍺 건배
+              {toastCooldown ? "⏳" : "🍺 건배"}
             </button>
           </div>
           <button
@@ -154,6 +184,11 @@ export default function RoomPage() {
 
       {showQR && (
         <QRShareModal url={joinUrl} onClose={() => setShowQR(false)} />
+      )}
+
+      {/* 건배 이펙트 */}
+      {toastEffect && (
+        <ToastOverlay key={toastEffect.at} type={toastEffect.type} />
       )}
     </div>
   );

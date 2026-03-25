@@ -1,0 +1,1098 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "app",
+    "languages": ["javascript", "typescript"],
+    "frameworks": ["React", "Tailwind CSS", "Vite", "Vitest"],
+    "description": "A React + TypeScript web app for tracking drink orders and calculating shared expenses among a group, featuring real-time room syncing via Firebase Firestore, a leaderboard, QR-based room sharing, and an automated settlement algorithm.",
+    "analyzedAt": "2026-03-18T12:11:58.152Z",
+    "gitCommitHash": "467eabfc7a964c234036d6a8edf4b9a595a7ef77"
+  },
+  "nodes": [
+    {
+      "id": "file:eslint.config.js",
+      "type": "file",
+      "name": "eslint.config.js",
+      "filePath": "eslint.config.js",
+      "summary": "Configures ESLint for the project with TypeScript, React Hooks, and React Refresh plugins, targeting browser globals and ES2020.",
+      "tags": ["config", "linting", "eslint", "typescript"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "src/App.tsx",
+      "summary": "Root application component that defines client-side routing for the drinking calculator app, mapping URL paths to HomePage, RoomPage, JoinPage, SettlePage, and ResultPage.",
+      "tags": ["entry-point", "component", "routing", "react"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/DrinkButtons.tsx",
+      "type": "file",
+      "name": "DrinkButtons.tsx",
+      "filePath": "src/components/DrinkButtons.tsx",
+      "summary": "Interactive UI component that lets a participant increment or decrement their soju and beer drink counts with a 10-second rate-limit cooldown to prevent spam tapping.",
+      "tags": ["component", "ui", "rate-limiting", "drink-tracking"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/components/DrinkButtons.tsx:handleTap",
+      "type": "function",
+      "name": "handleTap",
+      "filePath": "src/components/DrinkButtons.tsx",
+      "lineRange": [24, 41],
+      "summary": "Handles drink button taps by enforcing a per-drink-type cooldown period before persisting the updated count to Firestore via updateDrinkCount.",
+      "tags": ["event-handler", "rate-limiting", "firestore"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/Leaderboard.tsx",
+      "type": "file",
+      "name": "Leaderboard.tsx",
+      "filePath": "src/components/Leaderboard.tsx",
+      "summary": "Displays a ranked list of participants sorted by total drinks consumed, showing drink counts and providing the host with a toggle to mark participants as 'kkakdugi' (non-paying).",
+      "tags": ["component", "ui", "leaderboard", "display"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/QRShareModal.tsx",
+      "type": "file",
+      "name": "QRShareModal.tsx",
+      "filePath": "src/components/QRShareModal.tsx",
+      "summary": "Modal dialog that displays a QR code for the room's invite URL and provides a copy-to-clipboard button for sharing the room link with friends.",
+      "tags": ["component", "ui", "modal", "sharing"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/hooks/useLocalStorage.ts",
+      "type": "file",
+      "name": "useLocalStorage.ts",
+      "filePath": "src/hooks/useLocalStorage.ts",
+      "summary": "Generic React hook that synchronizes state with browser localStorage, providing persistent storage with JSON serialization and error handling.",
+      "tags": ["hook", "utility", "state-management", "local-storage"],
+      "complexity": "simple",
+      "languageNotes": "Uses TypeScript generics to provide type-safe localStorage access with const assertion on the return tuple."
+    },
+    {
+      "id": "func:src/hooks/useLocalStorage.ts:useLocalStorage",
+      "type": "function",
+      "name": "useLocalStorage",
+      "filePath": "src/hooks/useLocalStorage.ts",
+      "lineRange": [3, 23],
+      "summary": "Custom React hook that reads initial state from localStorage on mount and provides a setter that writes through to both React state and localStorage.",
+      "tags": ["hook", "utility", "state-management"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/hooks/useNotification.ts",
+      "type": "file",
+      "name": "useNotification.ts",
+      "filePath": "src/hooks/useNotification.ts",
+      "summary": "React hook that monitors participant drink data and triggers notifications when another participant's drinking pattern warrants attention, with a 30-minute cooldown between alerts.",
+      "tags": ["hook", "notification", "monitoring", "rate-limiting"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/hooks/useNotification.ts:useNotification",
+      "type": "function",
+      "name": "useNotification",
+      "filePath": "src/hooks/useNotification.ts",
+      "lineRange": [8, 42],
+      "summary": "Watches participant data changes via useEffect and calls shouldTriggerNotification from the settlement library for each non-kkakdugi active participant, invoking onNotify with a 30-minute per-participant cooldown.",
+      "tags": ["hook", "notification", "settlement-integration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/hooks/useRoom.ts",
+      "type": "file",
+      "name": "useRoom.ts",
+      "filePath": "src/hooks/useRoom.ts",
+      "summary": "React hook that subscribes to real-time Firestore updates for a room's status and its participants list, returning reactive state for both.",
+      "tags": ["hook", "real-time", "state-management", "firebase"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/hooks/useRoom.ts:useRoom",
+      "type": "function",
+      "name": "useRoom",
+      "filePath": "src/hooks/useRoom.ts",
+      "lineRange": [5, 25],
+      "summary": "Subscribes to Firestore snapshots for room document and participants subcollection, managing loading state and cleanup on unmount.",
+      "tags": ["hook", "subscription", "real-time", "firebase"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/firebase.ts",
+      "type": "file",
+      "name": "firebase.ts",
+      "filePath": "src/lib/firebase.ts",
+      "summary": "Initializes the Firebase app instance and Firestore database connection using environment variables for configuration.",
+      "tags": ["config", "firebase", "singleton", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/firestore.ts",
+      "type": "file",
+      "name": "firestore.ts",
+      "filePath": "src/lib/firestore.ts",
+      "summary": "Firestore data access layer providing CRUD operations and real-time subscriptions for rooms, participants, and settlement documents in the drinking calculator app.",
+      "tags": [
+        "service",
+        "data-model",
+        "firebase",
+        "api-handler",
+        "type-definition"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:createRoom",
+      "type": "function",
+      "name": "createRoom",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [38, 47],
+      "summary": "Creates a new room document in Firestore with active status and server timestamp, returning the generated room ID.",
+      "tags": ["service", "firebase", "create-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:joinRoom",
+      "type": "function",
+      "name": "joinRoom",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [50, 60],
+      "summary": "Adds a new participant document to a room's participants subcollection with default drink counts of zero.",
+      "tags": ["service", "firebase", "create-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:updateDrinkCount",
+      "type": "function",
+      "name": "updateDrinkCount",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [63, 75],
+      "summary": "Updates a participant's soju or beer count by a delta value, clamping at zero, and records a server timestamp for rate limiting.",
+      "tags": ["service", "firebase", "update-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:toggleKkakdugi",
+      "type": "function",
+      "name": "toggleKkakdugi",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [78, 86],
+      "summary": "Toggles a participant's kkakdugi (non-drinker) status in Firestore.",
+      "tags": ["service", "firebase", "update-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:closeRoom",
+      "type": "function",
+      "name": "closeRoom",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [99, 109],
+      "summary": "Marks a room as closed and sets a 24-hour TTL deleteAt timestamp for automatic cleanup.",
+      "tags": ["service", "firebase", "lifecycle"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:saveSettlement",
+      "type": "function",
+      "name": "saveSettlement",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [112, 123],
+      "summary": "Persists settlement calculation results (drink totals and per-person amounts) to a settlement subcollection in the room.",
+      "tags": ["service", "firebase", "create-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:toastAll",
+      "type": "function",
+      "name": "toastAll",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [126, 140],
+      "summary": "Increments drink count by 1 for all active non-kkakdugi participants in parallel, implementing a group toast feature.",
+      "tags": ["service", "firebase", "batch-operation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:subscribeParticipants",
+      "type": "function",
+      "name": "subscribeParticipants",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [143, 152],
+      "summary": "Sets up a real-time Firestore snapshot listener on a room's participants subcollection, mapping documents to typed objects with IDs.",
+      "tags": ["service", "firebase", "real-time", "subscription"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/firestore.ts:subscribeRoom",
+      "type": "function",
+      "name": "subscribeRoom",
+      "filePath": "src/lib/firestore.ts",
+      "lineRange": [155, 162],
+      "summary": "Subscribes to real-time updates on a room document, passing null to the callback if the room does not exist.",
+      "tags": ["service", "firebase", "real-time", "subscription"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/settlement.ts",
+      "type": "file",
+      "name": "settlement.ts",
+      "filePath": "src/lib/settlement.ts",
+      "summary": "Pure business logic for drink cost settlement: filters participants by status, calculates proportional cost splitting based on drink counts, and detects under-drinking for notifications.",
+      "tags": ["utility", "validation", "service", "type-definition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/lib/settlement.ts:getSettlementParticipants",
+      "type": "function",
+      "name": "getSettlementParticipants",
+      "filePath": "src/lib/settlement.ts",
+      "lineRange": [12, 16],
+      "summary": "Filters out kkakdugi (non-drinker) participants, returning only those who should be included in cost settlement.",
+      "tags": ["utility", "filter", "settlement"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/lib/settlement.ts:calculateSettlement",
+      "type": "function",
+      "name": "calculateSettlement",
+      "filePath": "src/lib/settlement.ts",
+      "lineRange": [25, 62],
+      "summary": "Calculates per-person cost by proportionally splitting soju and beer totals based on each participant's drink count, with equal split fallback when all counts are zero.",
+      "tags": ["utility", "settlement", "calculation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/lib/settlement.ts:shouldTriggerNotification",
+      "type": "function",
+      "name": "shouldTriggerNotification",
+      "filePath": "src/lib/settlement.ts",
+      "lineRange": [65, 81],
+      "summary": "Checks if a participant's total drink count is 3 or more below the average of other active participants, triggering an under-drinking notification.",
+      "tags": ["utility", "notification", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/main.tsx",
+      "type": "file",
+      "name": "main.tsx",
+      "filePath": "src/main.tsx",
+      "summary": "Application entry point that mounts the root React component with StrictMode into the DOM.",
+      "tags": ["entry-point", "initialization", "react"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/pages/HomePage.tsx",
+      "type": "file",
+      "name": "HomePage.tsx",
+      "filePath": "src/pages/HomePage.tsx",
+      "summary": "Landing page component that allows users to create a new drinking room by generating a host UUID, calling Firestore, and navigating to the room.",
+      "tags": ["component", "entry-point", "page", "react"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/pages/HomePage.tsx:HomePage",
+      "type": "function",
+      "name": "HomePage",
+      "filePath": "src/pages/HomePage.tsx",
+      "lineRange": [6, 44],
+      "summary": "React page component rendering the app landing screen with a create-room button that generates a host ID, creates a Firestore room, and navigates to it.",
+      "tags": ["component", "page", "react"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/pages/JoinPage.tsx",
+      "type": "file",
+      "name": "JoinPage.tsx",
+      "filePath": "src/pages/JoinPage.tsx",
+      "summary": "Join page component where users enter their name to join an existing drinking room via URL parameter, storing their participant ID in local storage.",
+      "tags": ["component", "page", "react", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "func:src/pages/JoinPage.tsx:JoinPage",
+      "type": "function",
+      "name": "JoinPage",
+      "filePath": "src/pages/JoinPage.tsx",
+      "lineRange": [6, 58],
+      "summary": "React page component with a name input form that joins a Firestore room using the URL roomId parameter and persists the participant ID to local storage.",
+      "tags": ["component", "page", "react", "form"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/pages/ResultPage.tsx",
+      "type": "file",
+      "name": "ResultPage.tsx",
+      "filePath": "src/pages/ResultPage.tsx",
+      "summary": "Displays the final settlement results in a receipt-style UI, showing each participant's drink counts and calculated payment amount. Provides image save (via html2canvas) and share functionality.",
+      "tags": ["component", "page", "settlement", "sharing", "react"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/pages/ResultPage.tsx:ResultPage",
+      "type": "function",
+      "name": "ResultPage",
+      "filePath": "src/pages/ResultPage.tsx",
+      "lineRange": [7, 117],
+      "summary": "React page component that fetches settlement data from Firestore, renders a receipt-style result card with per-participant costs, and offers image download and link sharing actions.",
+      "tags": ["component", "page", "react", "settlement"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/pages/RoomPage.tsx",
+      "type": "file",
+      "name": "RoomPage.tsx",
+      "filePath": "src/pages/RoomPage.tsx",
+      "summary": "Main drinking session room page where participants track their drinks in real-time. Hosts can manage kkakdugi status, trigger group toasts, share QR invites, and close the room to proceed to settlement.",
+      "tags": ["component", "page", "real-time", "room-management", "react"],
+      "complexity": "complex"
+    },
+    {
+      "id": "func:src/pages/RoomPage.tsx:RoomPage",
+      "type": "function",
+      "name": "RoomPage",
+      "filePath": "src/pages/RoomPage.tsx",
+      "lineRange": [16, 160],
+      "summary": "Central room page component that orchestrates real-time participant tracking, drink counting via DrinkButtons, leaderboard display, host controls for toasts and room closure, and QR-based invitations.",
+      "tags": ["component", "page", "react", "room-management", "real-time"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/pages/SettlePage.tsx",
+      "type": "file",
+      "name": "SettlePage.tsx",
+      "filePath": "src/pages/SettlePage.tsx",
+      "summary": "Settlement input page where the host enters total soju and beer costs from the receipt. Calculates per-person amounts using the settlement algorithm and saves results to Firestore.",
+      "tags": ["component", "page", "form", "settlement", "react"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "func:src/pages/SettlePage.tsx:SettlePage",
+      "type": "function",
+      "name": "SettlePage",
+      "filePath": "src/pages/SettlePage.tsx",
+      "lineRange": [8, 91],
+      "summary": "React page component providing a form for entering soju and beer total costs, calculating settlement via calculateSettlement, and persisting results to Firestore before navigating to the result page.",
+      "tags": ["component", "page", "form", "settlement"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/test/settlement.test.ts",
+      "type": "file",
+      "name": "settlement.test.ts",
+      "filePath": "src/test/settlement.test.ts",
+      "summary": "Comprehensive unit tests for the settlement module covering drink-proportional cost splitting, kkakdugi exclusion, early-leaver handling, rounding behavior, and notification trigger logic.",
+      "tags": ["test", "unit-test", "settlement", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/test/setup.ts",
+      "type": "file",
+      "name": "setup.ts",
+      "filePath": "src/test/setup.ts",
+      "summary": "Test environment setup file that imports jest-dom matchers for DOM assertion support in Vitest tests.",
+      "tags": ["test", "config", "setup"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Vite build configuration that enables React plugin, Tailwind CSS integration, and configures Vitest with jsdom environment and global test setup.",
+      "tags": ["config", "build", "vite", "test-config"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/pages/HomePage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/pages/RoomPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/pages/JoinPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/pages/SettlePage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/App.tsx",
+      "target": "file:src/pages/ResultPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/DrinkButtons.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/DrinkButtons.tsx",
+      "target": "func:src/components/DrinkButtons.tsx:handleTap",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/Leaderboard.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useLocalStorage.ts",
+      "target": "func:src/hooks/useLocalStorage.ts:useLocalStorage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useLocalStorage.ts",
+      "target": "func:src/hooks/useLocalStorage.ts:useLocalStorage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/hooks/useNotification.ts",
+      "target": "file:src/lib/settlement.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useNotification.ts",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useNotification.ts",
+      "target": "func:src/hooks/useNotification.ts:useNotification",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useNotification.ts",
+      "target": "func:src/hooks/useNotification.ts:useNotification",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/hooks/useRoom.ts",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useRoom.ts",
+      "target": "func:src/hooks/useRoom.ts:useRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useRoom.ts",
+      "target": "func:src/hooks/useRoom.ts:useRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firebase.ts",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "file:src/lib/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:createRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:joinRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:updateDrinkCount",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:toggleKkakdugi",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:closeRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:saveSettlement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:toastAll",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:subscribeParticipants",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:subscribeRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:createRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:joinRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:updateDrinkCount",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:toggleKkakdugi",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:closeRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:saveSettlement",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:toastAll",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:subscribeParticipants",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/firestore.ts",
+      "target": "func:src/lib/firestore.ts:subscribeRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:getSettlementParticipants",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:calculateSettlement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:shouldTriggerNotification",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:getSettlementParticipants",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:calculateSettlement",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "func:src/lib/settlement.ts:shouldTriggerNotification",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/main.tsx",
+      "target": "file:src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/HomePage.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/HomePage.tsx",
+      "target": "file:src/hooks/useLocalStorage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/HomePage.tsx",
+      "target": "func:src/pages/HomePage.tsx:HomePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/pages/HomePage.tsx",
+      "target": "func:src/pages/HomePage.tsx:HomePage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/pages/HomePage.tsx:HomePage",
+      "target": "func:src/lib/firestore.ts:createRoom",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/pages/JoinPage.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/JoinPage.tsx",
+      "target": "file:src/hooks/useLocalStorage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/JoinPage.tsx",
+      "target": "func:src/pages/JoinPage.tsx:JoinPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/pages/JoinPage.tsx",
+      "target": "func:src/pages/JoinPage.tsx:JoinPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/pages/JoinPage.tsx:JoinPage",
+      "target": "func:src/lib/firestore.ts:joinRoom",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/hooks/useRoom.ts:useRoom",
+      "target": "func:src/lib/firestore.ts:subscribeRoom",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "func:src/hooks/useRoom.ts:useRoom",
+      "target": "func:src/lib/firestore.ts:subscribeParticipants",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/test/settlement.test.ts",
+      "target": "file:src/lib/settlement.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/pages/ResultPage.tsx",
+      "target": "func:src/pages/ResultPage.tsx:ResultPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/pages/ResultPage.tsx",
+      "target": "func:src/pages/ResultPage.tsx:ResultPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/pages/ResultPage.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/ResultPage.tsx",
+      "target": "file:src/hooks/useRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "func:src/pages/RoomPage.tsx:RoomPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "func:src/pages/RoomPage.tsx:RoomPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/hooks/useRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/hooks/useLocalStorage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/hooks/useNotification.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/components/Leaderboard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/components/DrinkButtons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/RoomPage.tsx",
+      "target": "file:src/components/QRShareModal.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/SettlePage.tsx",
+      "target": "func:src/pages/SettlePage.tsx:SettlePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/pages/SettlePage.tsx",
+      "target": "func:src/pages/SettlePage.tsx:SettlePage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/pages/SettlePage.tsx",
+      "target": "file:src/hooks/useRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/SettlePage.tsx",
+      "target": "file:src/lib/firestore.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/pages/SettlePage.tsx",
+      "target": "file:src/lib/settlement.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/test/settlement.test.ts",
+      "target": "file:src/lib/settlement.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/settlement.ts",
+      "target": "file:src/test/settlement.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:pages",
+      "name": "Pages & Routing",
+      "description": "Application entry points, route definitions, and page-level containers that orchestrate the drinking session flow from room creation through settlement results.",
+      "nodeIds": [
+        "file:src/main.tsx",
+        "file:src/App.tsx",
+        "file:src/pages/HomePage.tsx",
+        "file:src/pages/JoinPage.tsx",
+        "file:src/pages/RoomPage.tsx",
+        "file:src/pages/SettlePage.tsx",
+        "file:src/pages/ResultPage.tsx"
+      ]
+    },
+    {
+      "id": "layer:ui-components",
+      "name": "UI Components",
+      "description": "Reusable React presentation components for drink tracking buttons, participant leaderboard display, and QR code sharing modal.",
+      "nodeIds": [
+        "file:src/components/DrinkButtons.tsx",
+        "file:src/components/Leaderboard.tsx",
+        "file:src/components/QRShareModal.tsx"
+      ]
+    },
+    {
+      "id": "layer:hooks",
+      "name": "Hooks",
+      "description": "Custom React hooks providing real-time Firestore room subscriptions, persistent local storage state, and drink notification monitoring logic.",
+      "nodeIds": [
+        "file:src/hooks/useLocalStorage.ts",
+        "file:src/hooks/useNotification.ts",
+        "file:src/hooks/useRoom.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Service & Data",
+      "description": "Firebase initialization, Firestore CRUD operations for rooms and participants, and pure settlement calculation business logic.",
+      "nodeIds": [
+        "file:src/lib/firebase.ts",
+        "file:src/lib/firestore.ts",
+        "file:src/lib/settlement.ts"
+      ]
+    },
+    {
+      "id": "layer:config-test",
+      "name": "Config & Testing",
+      "description": "Build tooling configuration (Vite, ESLint) and unit test suite covering settlement algorithm correctness and edge cases.",
+      "nodeIds": [
+        "file:eslint.config.js",
+        "file:vite.config.ts",
+        "file:src/test/setup.ts",
+        "file:src/test/settlement.test.ts"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Application Bootstrap",
+      "description": "Start with the two entry points: main.tsx mounts the React app into the DOM with StrictMode, and App.tsx defines the client-side router that maps URL paths to five pages (Home, Join, Room, Settle, Result). Together they reveal the entire user flow of the application at a glance -- creating a room, joining it, tracking drinks, settling costs, and viewing results.",
+      "nodeIds": ["file:src/main.tsx", "file:src/App.tsx"],
+      "languageLesson": "React Router's declarative route configuration maps URL patterns to page components, enabling single-page application navigation without full page reloads."
+    },
+    {
+      "order": 2,
+      "title": "Firebase Infrastructure",
+      "description": "The foundational Services/Lib layer has the highest fan-in in the entire codebase (firestore.ts is imported by 10 other nodes). firebase.ts initializes the Firebase app and Firestore database using environment variables, while firestore.ts builds the complete data access layer on top of it. These two files form a tightly coupled cluster with bidirectional imports -- firebase.ts provides the database instance that firestore.ts consumes for all CRUD operations and real-time subscriptions.",
+      "nodeIds": ["file:src/lib/firebase.ts", "file:src/lib/firestore.ts"]
+    },
+    {
+      "order": 3,
+      "title": "Firestore Data Operations",
+      "description": "The firestore module exposes a rich set of functions that every page depends on: createRoom and joinRoom handle room lifecycle, updateDrinkCount and toggleKkakdugi modify participant state, toastAll implements a group drinking feature, and subscribeRoom/subscribeParticipants provide real-time snapshot listeners. Understanding these functions is essential because they define the contract between the UI layer and the database.",
+      "nodeIds": [
+        "func:src/lib/firestore.ts:createRoom",
+        "func:src/lib/firestore.ts:joinRoom",
+        "func:src/lib/firestore.ts:updateDrinkCount",
+        "func:src/lib/firestore.ts:subscribeRoom",
+        "func:src/lib/firestore.ts:subscribeParticipants"
+      ],
+      "languageLesson": "Firestore's onSnapshot API pushes real-time updates to the client whenever documents change, eliminating the need for polling and enabling collaborative features where multiple users see changes instantly."
+    },
+    {
+      "order": 4,
+      "title": "Settlement Business Logic",
+      "description": "settlement.ts is a pure business logic module with no Firebase dependencies, making it the most testable part of the codebase. It contains three key functions: getSettlementParticipants filters out non-paying (kkakdugi) members, calculateSettlement splits costs proportionally based on each person's drink count with an equal-split fallback, and shouldTriggerNotification detects when someone is drinking significantly less than the group average. This separation of concerns keeps the cost-splitting algorithm independent of the data layer.",
+      "nodeIds": [
+        "file:src/lib/settlement.ts",
+        "func:src/lib/settlement.ts:calculateSettlement",
+        "func:src/lib/settlement.ts:shouldTriggerNotification"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Custom React Hooks",
+      "description": "The hooks layer bridges the Firebase data layer and the UI. useRoom subscribes to real-time Firestore snapshots for both the room document and its participants subcollection, managing loading state and cleanup on unmount. useLocalStorage provides persistent client-side state (used to remember participant IDs across sessions). useNotification monitors drink data and triggers alerts when a participant falls 3+ drinks below the group average, with a 30-minute cooldown to avoid spam.",
+      "nodeIds": [
+        "file:src/hooks/useRoom.ts",
+        "file:src/hooks/useLocalStorage.ts",
+        "file:src/hooks/useNotification.ts"
+      ],
+      "languageLesson": "Custom hooks encapsulate subscription logic and side effects (useEffect cleanup), letting page components remain declarative while the hooks handle Firestore listener setup and teardown."
+    },
+    {
+      "order": 6,
+      "title": "Home and Join Pages",
+      "description": "HomePage is the landing screen where a user creates a new drinking room -- it generates a host UUID, calls createRoom on Firestore, and navigates to the room. JoinPage handles the invite flow: when someone opens a shared link with a roomId parameter, they enter their name, joinRoom writes them into the participants subcollection, and their participant ID is persisted to localStorage via useLocalStorage. These two pages demonstrate the two entry paths into a drinking session.",
+      "nodeIds": ["file:src/pages/HomePage.tsx", "file:src/pages/JoinPage.tsx"]
+    },
+    {
+      "order": 7,
+      "title": "Room Page - Core Experience",
+      "description": "RoomPage is the heart of the application and the highest fan-out file in the codebase (7 imports). It orchestrates real-time participant tracking via useRoom, drink counting through DrinkButtons, a live leaderboard, host-only controls for group toasts and room closure, notification monitoring via useNotification, and QR-based room sharing. This single page ties together almost every other module in the project, serving as the primary screen users interact with during a drinking session.",
+      "nodeIds": ["file:src/pages/RoomPage.tsx"]
+    },
+    {
+      "order": 8,
+      "title": "Interactive UI Components",
+      "description": "Three focused components power the RoomPage experience. DrinkButtons lets participants tap to increment or decrement their soju and beer counts, with a 10-second rate-limit cooldown enforced by handleTap to prevent spam. Leaderboard ranks participants by total drinks and gives the host a toggle to mark someone as kkakdugi (non-paying). QRShareModal generates a QR code for the room's invite URL with a copy-to-clipboard fallback, enabling easy room sharing.",
+      "nodeIds": [
+        "file:src/components/DrinkButtons.tsx",
+        "file:src/components/Leaderboard.tsx",
+        "file:src/components/QRShareModal.tsx"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Settlement and Results Flow",
+      "description": "After the host closes a room, the flow continues to SettlePage where they input total soju and beer costs from the receipt. The page calls calculateSettlement to compute proportional per-person amounts and saves the results to Firestore via saveSettlement. ResultPage then fetches these results and renders them in a receipt-style card showing each participant's drink counts and payment amount, with image download (via html2canvas) and link sharing actions for easy distribution.",
+      "nodeIds": [
+        "file:src/pages/SettlePage.tsx",
+        "file:src/pages/ResultPage.tsx"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Testing and Build Config",
+      "description": "settlement.test.ts provides comprehensive unit tests for the settlement algorithm, covering proportional cost splitting, kkakdugi exclusion, early-leaver handling, rounding edge cases, and notification trigger logic. The test infrastructure uses Vitest (configured in vite.config.ts with jsdom environment) and jest-dom matchers (imported in setup.ts). Notice that only the pure business logic module has tests -- the Firebase-dependent code relies on integration rather than unit testing.",
+      "nodeIds": [
+        "file:src/test/settlement.test.ts",
+        "file:vite.config.ts",
+        "file:src/test/setup.ts"
+      ]
+    }
+  ]
+}

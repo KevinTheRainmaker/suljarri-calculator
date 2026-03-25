@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import { getSettlement } from "../lib/firestore";
 import { useRoom } from "../hooks/useRoom";
 
@@ -20,16 +20,16 @@ export default function ResultPage() {
 
   async function handleSaveImage() {
     if (!receiptRef.current) return;
-    const canvas = await html2canvas(receiptRef.current, {
+    const dataUrl = await toPng(receiptRef.current, {
       backgroundColor: "#1f2937",
     });
     const link = document.createElement("a");
     link.download = "잔잔바라_정산.png";
-    link.href = canvas.toDataURL();
+    link.href = dataUrl;
     link.click();
   }
 
-  function handleKakaoShare() {
+  function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
       navigator.share({ title: "잔잔바라 정산 결과", url });
@@ -37,6 +37,34 @@ export default function ResultPage() {
       navigator.clipboard.writeText(url);
       alert("링크가 복사되었습니다!");
     }
+  }
+
+  function handleCopyText() {
+    if (!settlement) return;
+    const sorted = Object.entries(settlement.result).sort(
+      ([, a], [, b]) => b - a,
+    );
+    const lines = sorted.map(([id, amount]) => {
+      const p = participantMap[id];
+      const name = p?.name ?? id;
+      const drinks = p ? ` (🍶${p.soju} 🍺${p.beer})` : "";
+      return `${name}${drinks}: ${amount.toLocaleString()}원`;
+    });
+    const total = (
+      settlement.sojuTotal + settlement.beerTotal
+    ).toLocaleString();
+    const text = [
+      "🍶 잔잔바라 정산 결과",
+      `소주 ${settlement.sojuTotal.toLocaleString()}원 / 맥주 ${settlement.beerTotal.toLocaleString()}원`,
+      "",
+      ...lines,
+      "",
+      `총 ${total}원`,
+      "",
+      "잔잔바라로 공정하게 정산했어요 🍻",
+    ].join("\n");
+    navigator.clipboard.writeText(text);
+    alert("정산 내역이 복사되었습니다!");
   }
 
   if (!settlement)
@@ -100,16 +128,22 @@ export default function ResultPage() {
       {/* 액션 버튼 */}
       <div className="w-full max-w-md space-y-2">
         <button
+          onClick={handleCopyText}
+          className="w-full py-4 bg-amber-500 hover:bg-amber-400 rounded-xl font-bold text-black"
+        >
+          📋 정산 내역 복사
+        </button>
+        <button
           onClick={handleSaveImage}
           className="w-full py-4 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium"
         >
           📸 이미지 저장
         </button>
         <button
-          onClick={handleKakaoShare}
-          className="w-full py-4 bg-amber-500 hover:bg-amber-400 rounded-xl font-bold text-black"
+          onClick={handleShare}
+          className="w-full py-4 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium"
         >
-          💬 공유하기
+          🔗 링크 공유
         </button>
       </div>
     </div>

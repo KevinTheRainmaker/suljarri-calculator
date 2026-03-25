@@ -21,6 +21,21 @@ export default function SettlePage() {
       return;
     }
 
+    const totalSojuDrinks = participants.reduce((sum, p) => sum + p.soju, 0);
+    const totalBeerDrinks = participants.reduce((sum, p) => sum + p.beer, 0);
+    if (totalSojuDrinks > 0 && soju === 0) {
+      alert(
+        "소주를 마신 기록이 있는데 소주 금액이 0원입니다. 금액을 입력해주세요.",
+      );
+      return;
+    }
+    if (totalBeerDrinks > 0 && beer === 0) {
+      alert(
+        "맥주를 마신 기록이 있는데 맥주 금액이 0원입니다. 금액을 입력해주세요.",
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const mapped: Participant[] = participants.map((p) => ({

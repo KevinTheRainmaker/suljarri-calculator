@@ -25,14 +25,14 @@
 
 ## 기술 스택
 
-| 카테고리 | 기술 |
-|---------|------|
-| Frontend | React 19, TypeScript |
-| 스타일링 | Tailwind CSS 4 |
-| 빌드 | Vite 8 |
-| 백엔드 | Firebase Firestore (실시간 동기화) |
-| 테스트 | Vitest, Testing Library |
-| 기타 | html2canvas (이미지 저장), qrcode.react (QR 생성) |
+| 카테고리 | 기술                                              |
+| -------- | ------------------------------------------------- |
+| Frontend | React 19, TypeScript                              |
+| 스타일링 | Tailwind CSS 4                                    |
+| 빌드     | Vite 8                                            |
+| 백엔드   | Firebase Firestore (실시간 동기화)                |
+| 테스트   | Vitest, Testing Library                           |
+| 기타     | html2canvas (이미지 저장), qrcode.react (QR 생성) |
 
 ## 프로젝트 구조
 

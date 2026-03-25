@@ -4,6 +4,7 @@ import RoomPage from "./pages/RoomPage";
 import JoinPage from "./pages/JoinPage";
 import SettlePage from "./pages/SettlePage";
 import ResultPage from "./pages/ResultPage";
+import AdBanner from "./components/AdBanner";
 
 export default function App() {
   return (
@@ -17,9 +18,7 @@ export default function App() {
           <Route path="/room/:roomId/result" element={<ResultPage />} />
         </Routes>
         {/* 하단 광고 배너 */}
-        <div className="fixed bottom-0 left-0 right-0 h-14 bg-gray-900 flex items-center justify-center text-xs text-gray-500 border-t border-gray-800">
-          광고 배너 영역
-        </div>
+        <AdBanner />
       </div>
     </BrowserRouter>
   );

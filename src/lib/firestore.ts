@@ -11,12 +11,18 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 
+export interface ToastEvent {
+  type: "soju" | "beer";
+  at: number;
+}
+
 export interface RoomDoc {
   hostId: string;
   status: "active" | "closed";
   createdAt: Timestamp;
   closedAt: Timestamp | null;
   deleteAt: Timestamp | null;
+  lastToast?: ToastEvent | null;
 }
 
 export interface ParticipantDoc {
@@ -122,7 +128,7 @@ export async function saveSettlement(
   });
 }
 
-// 건배 (활성 참여자 전원 +1)
+// 건배 (활성 참여자 전원 +1 + 이벤트 기록)
 export async function toastAll(
   roomId: string,
   type: "soju" | "beer",
@@ -134,6 +140,12 @@ export async function toastAll(
   const updates = active.map((p) =>
     updateDoc(doc(db, "rooms", roomId, "participants", p.id), {
       [type]: (type === "soju" ? p.soju : p.beer) + 1,
+    }),
+  );
+  // room 문서에 건배 이벤트 기록 (전원 화면에 이펙트 표시용)
+  updates.push(
+    updateDoc(doc(db, "rooms", roomId), {
+      lastToast: { type, at: Date.now() },
     }),
   );
   await Promise.all(updates);

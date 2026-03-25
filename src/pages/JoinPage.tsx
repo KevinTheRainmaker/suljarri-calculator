@@ -2,16 +2,24 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { joinRoom } from "../lib/firestore";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useRoom } from "../hooks/useRoom";
 
 export default function JoinPage() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
+  const { room, loading: roomLoading } = useRoom(roomId!);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [, setParticipantId] = useLocalStorage<string | null>(
     `participant-${roomId}`,
     null,
   );
+
+  // 종료된 방은 정산 결과로 리다이렉트
+  if (!roomLoading && room?.status === "closed") {
+    navigate(`/room/${roomId}/result`, { replace: true });
+    return null;
+  }
 
   async function handleJoin() {
     if (!name.trim() || !roomId) return;
