@@ -23,6 +23,21 @@
                     방 종료 → 비용 입력 → 정산 결과
 ```
 
+## 스크린샷
+
+- 홈 (모바일)
+  ![home](public/screenshots/mobile-home.png)
+- 참가자 참여(초대 링크, 모바일)
+  ![join](public/screenshots/mobile-join.png)
+- 실시간 음주 트래킹(룸, 모바일)
+  ![room](public/screenshots/mobile-room.png)
+- 잔 추가 기능 (+1 마셨다!)
+  ![drink-add](public/screenshots/mobile-drink-add.png)
+- 비용 입력/정산 (모바일)
+  ![settle](public/screenshots/mobile-settle.png)
+- 영수증 스타일 결과 (모바일)
+  ![result](public/screenshots/mobile-result.png)
+
 ## 기술 스택
 
 | 카테고리 | 기술                                              |
@@ -82,6 +97,12 @@ npm run build
 ## 환경 변수
 
 Firebase 설정을 위한 환경 변수가 필요합니다. `.env` 파일을 생성하고 Firebase 프로젝트 설정값을 입력하세요.
+
+### 데모 모드 (Firebase 없이 실행)
+
+```
+VITE_DEMO_MODE=true
+```
 
 ## 아키텍처
 
