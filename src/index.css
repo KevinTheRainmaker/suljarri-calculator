@@ -1,23 +1,105 @@
 @import "tailwindcss";
 
-@keyframes toast-text {
+/* 왼쪽 술잔: 왼쪽에서 날아와 중앙에서 부딪힘 */
+@keyframes glass-clink-left {
   0% {
+    transform: translateX(-280px) rotate(0deg);
     opacity: 0;
-    transform: scale(0.3);
   }
-  30% {
+  10% {
     opacity: 1;
-    transform: scale(1.1);
   }
-  50% {
+  /* 충돌 (1s @ 3s total) */
+  33% {
+    transform: translateX(-22px) rotate(22deg) scale(1.08);
+  }
+  /* 리바운드 */
+  43% {
+    transform: translateX(-42px) rotate(12deg) scale(1);
+  }
+  /* 안착 */
+  54% {
+    transform: translateX(-30px) rotate(18deg);
+  }
+  82% {
+    transform: translateX(-30px) rotate(18deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-30px) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+/* 오른쪽 술잔: 오른쪽에서 날아와 중앙에서 부딪힘 */
+@keyframes glass-clink-right {
+  0% {
+    transform: translateX(280px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  33% {
+    transform: translateX(22px) rotate(-22deg) scale(1.08);
+  }
+  43% {
+    transform: translateX(42px) rotate(-12deg) scale(1);
+  }
+  54% {
+    transform: translateX(30px) rotate(-18deg);
+  }
+  82% {
+    transform: translateX(30px) rotate(-18deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(30px) rotate(-18deg);
+    opacity: 0;
+  }
+}
+
+/* 건배! 텍스트: 충돌 순간 크게 팝인 */
+@keyframes gunbae-title {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  38% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  48% {
     transform: scale(1);
   }
   80% {
     opacity: 1;
+    transform: scale(1);
   }
   100% {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.92);
+  }
+}
+
+/* 충돌 지점 스파클 */
+@keyframes sparkle-pop {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  36% {
+    opacity: 1;
+    transform: scale(1.6) rotate(30deg);
+  }
+  54% {
+    opacity: 0;
+    transform: scale(0.6) rotate(60deg);
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -38,10 +120,22 @@
   }
 }
 
-.animate-toast-text {
-  animation: toast-text 2.5s ease-out forwards;
+.animate-glass-left {
+  animation: glass-clink-left 3s ease-out forwards;
+}
+
+.animate-glass-right {
+  animation: glass-clink-right 3s ease-out forwards;
+}
+
+.animate-gunbae-title {
+  animation: gunbae-title 3s ease-out forwards;
+}
+
+.animate-sparkle-pop {
+  animation: sparkle-pop 3s ease-out forwards;
 }
 
 .animate-toast-float {
-  animation: toast-float 2.5s ease-out forwards;
+  animation: toast-float 3s ease-out forwards;
 }
